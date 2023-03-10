@@ -1,7 +1,10 @@
 import subjectsData from "../subjects.json"
 import { faker } from "@faker-js/faker";
-import { getRandomNum, randomSubjcetIDFromTeacher, createClasses } from "../helpers/default";
-import { SubjectFromTeacher } from "../helpers/default";
+
+import { Subject } from "../types/subjects";
+import { createClasses } from "../helpers/classes";
+import { getRandomNum } from "../helpers/default";
+import { randomSubjcetIDFromTeacher } from "../helpers/lessons";
 
 const getDataSubjects = () => new Promise((res) => {
 	const subjects = subjectsData.subjects.map(sobj => {
@@ -21,7 +24,7 @@ const getDataRooms = () => new Promise((res) => {
 	setTimeout(() => res({ data: rooms }), 700)
 });
 
-const getDataTeachers = (array: SubjectFromTeacher[]) => new Promise((res) => {
+const getDataTeachers = (array: Subject[]) => new Promise((res) => {
 	const teachers = Array.from(
 		{ length: 21 },
 		(_, index) => {
@@ -47,7 +50,7 @@ export const getRooms = () => {
 	return res;
 };
 
-export const getTeachers = (array: SubjectFromTeacher[]) => {
+export const getTeachers = (array: Subject[]) => {
 	const res = getDataTeachers(array);
 	return res;
 };

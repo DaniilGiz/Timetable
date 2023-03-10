@@ -1,15 +1,18 @@
 import { RootState } from './store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getClasses, getRooms, getSubjects, getTeachers } from '../Api';
-import { SubjectFromTeacher } from '../helpers/default';
+import { IClass, IGroup } from '../types/timetable';
+import { Subject } from '../types/subjects';
+import { Room } from '../types/rooms';
+import { Teacher } from '../types/teachers';
 
 
 export interface TimetableInterface {
-	teachers: object[];
-	classes: object[];
-	rooms: object[];
-	subjects: SubjectFromTeacher[];
-	timetable: object[];
+	teachers: Teacher[];
+	classes: IClass[];
+	rooms: Room[];
+	subjects: Subject[];
+	timetable: IGroup[];
 	status: 'idle' | 'loading' | 'failed';
 };
 
@@ -27,19 +30,19 @@ const timetableSlice = createSlice({
 	name: 'classes',
 	initialState,
 	reducers: {
-		addClasses: (state, action: PayloadAction<object[]>) => {
+		addClasses: (state, action: PayloadAction<IClass[]>) => {
 			state.classes = action.payload;
 		},
-		addSubjects: (state, action: PayloadAction<SubjectFromTeacher[]>) => {
+		addSubjects: (state, action: PayloadAction<Subject[]>) => {
 			state.subjects = action.payload;
 		},
-		addTeachers: (state, action: PayloadAction<object[]>) => {
+		addTeachers: (state, action: PayloadAction<Teacher[]>) => {
 			state.teachers = action.payload;
 		},
-		addRooms: (state, action: PayloadAction<object[]>) => {
+		addRooms: (state, action: PayloadAction<Room[]>) => {
 			state.rooms = action.payload;
 		},
-		addTimetable: (state, action: PayloadAction<object[]>) => {
+		addTimetable: (state, action: PayloadAction<IGroup[]>) => {
 			state.timetable = action.payload;
 		}
 	}
@@ -64,7 +67,9 @@ export const setClasses = createAsyncThunk(
 	'classes/setClasses',
 	async (_: | void, thunkAPI) => {
 		getClasses()
-			.then((res: any) => thunkAPI.dispatch(addClasses(res.data)))
+			.then((res: any) => {
+				thunkAPI.dispatch(addClasses(res.data))
+			})
 			.catch(err => console.log(err))
 	}
 )
@@ -89,7 +94,7 @@ export const setRooms = createAsyncThunk(
 
 export const setTeachers = createAsyncThunk(
 	'teachers/setTeachers',
-	async (array: SubjectFromTeacher[], thunkAPI) => {
+	async (array: Subject[], thunkAPI) => {
 		getTeachers(array)
 			.then((res: any) => thunkAPI.dispatch(addTeachers(res.data)))
 			.catch(err => console.log(err))

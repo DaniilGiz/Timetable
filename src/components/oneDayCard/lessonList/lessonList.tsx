@@ -1,10 +1,15 @@
 import React from "react";
 import { Draggable } from 'react-beautiful-dnd';
 import { v4 as uuidv4 } from 'uuid';
+import { IDayOfWeek } from "../../../types/timetable";
 
-const LessonList = React.memo(function QuoteList({ timetableDay }: any) {
+interface ILessonList {
+    timetableDay: IDayOfWeek[];
+}
 
-	return timetableDay.map((less: any, lessIndex: number) => {
+const LessonListComponent = ({ timetableDay }: ILessonList) => {
+
+	const timetableElement = timetableDay.map((less: IDayOfWeek | null | IDayOfWeek[], lessIndex: number) => {
 		if (!less) {
 			const id = uuidv4();
 			return (
@@ -20,7 +25,7 @@ const LessonList = React.memo(function QuoteList({ timetableDay }: any) {
 				</Draggable>
 			)
 		}
-		if (less && !less.id) {
+		if (less && Array.isArray(less)) {
 			return (
 				<Draggable key={less[0].id} draggableId={less[0].id} index={lessIndex}>
 					{(provider, snapshot) => (
@@ -68,19 +73,12 @@ const LessonList = React.memo(function QuoteList({ timetableDay }: any) {
 		)
 
 	});
-});
 
+    return (
+        <React.Fragment>
+            {timetableElement}
+        </React.Fragment>
+    )
+};
 
-
-const OneDayCard = ({ group, day }: any) => {
-
-	return (
-		<div className="card">
-			{group && group[day] &&
-				<LessonList timetableDay={group[day]} />
-			}
-		</div>
-	)
-}
-
-export default OneDayCard;
+export const LessonList =  React.memo(LessonListComponent);

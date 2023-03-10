@@ -1,36 +1,26 @@
-import OneDayCard from "../cards";
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { reorder, removeDraggable, checkingMultipleLessons } from '../../helpers/default';
+import OneDayCard from "../oneDayCard/oneDayCard";
+import { DragDropContext, DraggableLocation, Droppable, DropResult } from 'react-beautiful-dnd';
+import { reorder, removeDraggable } from '../../helpers/default';
+import { checkingMultipleLessons } from "../../helpers/lessons";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { addTimetable, roomsState, teachersState, timetableState } from "../../redux/timetable";
+import { IGroup } from "../../types/timetable";
+import { FC } from "react";
 
-interface GroupInterface {
-	class: {
-		level: number,
-		letter: string
-	},
-	letter: string
-	Monday: object[],
-	Tuesday: object[],
-	Wednesday: object[],
-	Thursday: object[],
-	Friday: object[]
-}
-
-interface PropsInterface {
-	group: GroupInterface
+interface ITimetableForClass {
+	group: IGroup
 }
 
 
-const TimetableForClass = ({ group }: PropsInterface) => {
+const TimetableForClass: FC<ITimetableForClass> = ({ group }) => {
 	const timetable = useAppSelector(timetableState);
 	const teachers = useAppSelector(teachersState);
 	const rooms = useAppSelector(roomsState);
 	const dispatch = useAppDispatch();
 
-	const refreshTimetable = (timetable: any, classObject: any, start: any, end: any) => {
-		const copyTimetable: any = [...timetable];
-		const changedClassIndex = copyTimetable.findIndex((group: any) =>
+	const refreshTimetable = (timetable: IGroup[], classObject: IGroup, start: DraggableLocation, end: DraggableLocation) => {
+		const copyTimetable: IGroup[] = [...timetable];
+		const changedClassIndex = copyTimetable.findIndex((group: IGroup) =>
 			group.class.level === classObject.class.level && group.class.letter === classObject.class.letter
 		)
 		copyTimetable.splice(changedClassIndex, 1, classObject)
@@ -42,21 +32,20 @@ const TimetableForClass = ({ group }: PropsInterface) => {
 	};
 
 
-	const onDragEnd = (result: any) => {
+	const onDragEnd = (result: DropResult) => {
 		const { destination, source } = result;
 
 		if (!destination) {
 			const quotes = removeDraggable(
 				group,
-				result.source,
-				result.destination
+				source,
 			);
 
 			refreshTimetable(
 				timetable,
 				quotes,
-				result.source,
-				result.source
+				source,
+				source
 			);
 			return
 		}
@@ -65,31 +54,31 @@ const TimetableForClass = ({ group }: PropsInterface) => {
 
 		const quotes = reorder(
 			group,
-			result.source,
-			result.destination
+			source,
+			destination
 		);
 
 		refreshTimetable(
 			timetable,
 			quotes,
-			result.source,
-			result.destination
+			source,
+			destination
 		);
 	};
 
-	const dayOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+	const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 	if (!group) {
-		return <p>loading...</p>
+		return null;
 	}
 
 	return (
-		<DragDropContext onDragEnd={onDragEnd} onDragStart={() => { }}>
+		<DragDropContext onDragEnd={onDragEnd}>
 			<div className="class-column">
 				<div className="class-number">
 					{group.class.level} - {group.class.letter}
 				</div>
-				{dayOfWeek.map((day, dayIndex) => {
+				{daysOfWeek.map((day, dayIndex) => {
 					return (
 						<Droppable droppableId={day} key={dayIndex}>
 							{(provider, snapshot) => (

@@ -1,12 +1,14 @@
-interface LayoutProps {
+import { FC } from "react";
+
+interface ITimetableWrapper {
 	children: React.ReactNode
 }
 
-const TimetableWrapper = (props: LayoutProps) => {
+const TimetableWrapper: FC<ITimetableWrapper> = ({ children }) => {
 	return (
-		<div className="timetable-wrapper">
-			{props.children}
-		</div>
+		<>
+			{children}
+		</>
 	)
 }
 
